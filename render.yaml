@@ -1,58 +1,48 @@
-# render.yaml — Crowd FAQ deployment blueprint
+# render.yaml — OpenClaw Crowd FAQ deployment blueprint
 # Docs: https://render.com/docs/yaml
 
-# ── Global defaults ──────────────────────────────────────────────────────
 services:
   # ── Backend API ──────────────────────────────────────────────────────────
-  - name: crowd-faq-backend
+  - name: openclaw-crowd-backend
+    type: web
     plan: free
-    region: singapore       # closest to India; change if needed
+    region: singapore
     runtime: node
+    rootDir: ./server
     buildCommand: npm install
     startCommand: npm start
 
-    # Environment variables (secret values set in Render dashboard)
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
       - key: MONGO_URI
-        sync: false          # set in Render dashboard as a secret
+        sync: false          # Set in Render dashboard: mongodb://localhost:27017/crowd_faq or Atlas URI
       - key: JWT_SECRET
-        sync: false          # set in Render dashboard as a secret
+        sync: false          # Set in Render dashboard: crowd_faq_super_secret_key_2026
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: CLIENT_URL
-        # Fill in after frontend deploys — e.g. https://crowd-faq-frontend.onrender.com
-        sync: false
-      - key: LLM_API_KEY
-        sync: false          # OpenAI key for cloud LLM (required for production)
-      - key: LLM_PROVIDER
-        value: openai        # or "anthropic", "ollama" (only if self-hosting GPU)
-      - key: LLM_MODEL
-        value: gpt-4o-mini   # change to your preferred model
+        value: https://openclaw-crowd-frontend.onrender.com
+      - key: OPENAI_API_KEY
+        sync: false          # Set your OpenAI API key in Render dashboard
 
-    # Health check — Render pings this to keep service alive
     healthCheckPath: /api/health
 
   # ── Frontend (static) ────────────────────────────────────────────────────
-  - name: crowd-faq-frontend
+  - name: openclaw-crowd-frontend
+    type: web
     plan: free
     region: singapore
     runtime: static
+    rootDir: ./client
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    headers:
-      - path: /*
-        name: Cache-Control
-        value: public, max-age=0, must-revalidate
+    staticPublishPath: ./dist
+    
     envVars:
       - key: VITE_API_URL
-        # Points to backend — update after backend is deployed
-        value: https://crowd-faq-backend.onrender.com
-      - key: VITE_GITHUB_USERNAME
-        value: Nancypaul08
+        value: https://openclaw-crowd-backend.onrender.com
 
 # ── Notes ──────────────────────────────────────────────────────────────────
 #

@@ -28,7 +28,7 @@ async function ollamaChat(userQuery, systemPrompt, conversationHistory = [], opt
   const messages = [
     { role: 'system', content: systemPrompt },
     ...conversationHistory.map(m => ({ role: m.role, content: m.content })),
-    { role: 'user',   content: userQuery }),
+    { role: 'user',   content: userQuery },
   ];
 
   const res = await ollamaFetch('/api/chat', {
@@ -51,7 +51,7 @@ async function openaiChat(userQuery, systemPrompt, conversationHistory = [], opt
   const messages = [
     { role: 'system', content: systemPrompt },
     ...conversationHistory.map(m => ({ role: m.role, content: m.content })),
-    { role: 'user',   content: userQuery }),
+    { role: 'user',   content: userQuery },
   ];
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
